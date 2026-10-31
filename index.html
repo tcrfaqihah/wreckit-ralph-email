@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Designed by Teacher Faqihah - Fix-It Felix Email Arcade</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      background-image: radial-gradient(#1e293b 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .font-arcade {
+      font-family: 'Press Start 2P', cursive;
+    }
+    
+    .font-heading {
+      font-family: 'Fredoka', cursive, sans-serif;
+    }
+
+    /* Arcade Cabinet Border Styling */
+    .arcade-border {
+      border: 4px solid #f59e0b;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.6);
+    }
+
+    .arcade-btn {
+      transition: all 0.1s ease;
+      box-shadow: 0 6px 0 #92400e;
+    }
+    .arcade-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #92400e;
+    }
+
+    /* Retro Building Brick Patterns */
+    .niceland-building {
+      background: #7f1d1d;
+      background-image: linear-gradient(335deg, rgba(0, 0, 0, 0.3) 0px, transparent 2px),
+                        linear-gradient(155deg, rgba(255, 255, 255, 0.1) 0px, transparent 2px);
+      background-size: 20px 20px;
+    }
+
+    /* Glass window effect */
+    .window-intact {
+      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+      border: 3px solid #fef08a;
+      box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.8);
+    }
+    .window-broken {
+      background: #450a0a;
+      border: 3px solid #ef4444;
+      position: relative;
+    }
+    .window-broken::before {
+      content: "⚡";
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #f87171;
+      font-size: 1.2rem;
+    }
+
+    @keyframes ralphShake {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(-3px, 3px) rotate(-1deg); }
+      75% { transform: translate(3px, -3px) rotate(1deg); }
+    }
+    .ralph-animation {
+      animation: ralphShake 0.4s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- TOP HEADER -->
+  <header class="bg-slate-900 border-b-4 border-amber-500 shadow-xl sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center text-xl font-bold shadow-lg">
+          <i class="fa-solid fa-hammer"></i>
+        </div>
+        <div>
+          <span class="text-[10px] font-arcade uppercase tracking-widest text-amber-400 block">Wreck-It Ralph English Arcade</span>
+          <h1 class="text-base sm:text-lg font-heading font-bold text-white flex items-center gap-2 tracking-wide">
+            Designed by Teacher Faqihah
+          </h1>
+        </div>
+      </div>
+
+      <!-- Retro Audio Toggle & Tab Navigation -->
+      <div class="flex items-center gap-3">
+        <button onclick="toggleAudio()" id="audio-btn" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-amber-400 text-xs font-bold hover:bg-slate-700 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-volume-high" id="audio-icon"></i>
+          <span id="audio-status">SFX: ON</span>
+        </button>
+
+        <nav class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
+          <button id="nav-student-btn" onclick="switchTab('student')" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold shadow">
+            <i class="fa-solid fa-gamepad mr-1"></i> Arcade Portal
+          </button>
+          <button id="nav-teacher-btn" onclick="switchTab('teacher')" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">
+            <i class="fa-solid fa-trophy mr-1"></i> Teacher High Scores
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+    <!-- 1. WELCOME SCREEN (ARCADE CABINET ENTRY) -->
+    <section id="screen-welcome" class="max-w-xl mx-auto">
+      <div class="bg-slate-900 rounded-3xl p-6 sm:p-10 arcade-border text-center relative overflow-hidden">
+        
+        <!-- Ralph & Felix Banner -->
+        <div class="flex justify-between items-center mb-6 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+          <div class="text-center">
+            <span class="text-3xl">🧱</span>
+            <span class="text-[10px] font-arcade text-rose-400 block mt-1">RALPH</span>
+          </div>
+          <div class="text-center px-2">
+            <span class="text-xs font-arcade text-amber-400 animate-pulse block">INSERT COIN</span>
+            <span class="text-xs font-bold text-slate-400">FIX THE EMAILS!</span>
+          </div>
+          <div class="text-center">
+            <span class="text-3xl">🔨</span>
+            <span class="text-[10px] font-arcade text-sky-400 block mt-1">FELIX</span>
+          </div>
+        </div>
+
+        <h2 class="text-xl sm:text-2xl font-arcade text-amber-400 mb-2 leading-relaxed">FIX-IT FELIX JR.</h2>
+        <p class="text-slate-300 text-xs sm:text-sm mb-6">Ralph has smashed Niceland's email building into pieces! Help Fix-It Felix repair all 5 sets of email tasks before time runs out!</p>
+
+        <form onsubmit="handleLogin(event)" class="space-y-4 text-left">
+          <div>
+            <label for="student-name" class="block text-xs font-arcade text-amber-300 mb-2 uppercase">
+              <i class="fa-solid fa-user mr-1"></i> Student Name
+            </label>
+            <input type="text" id="student-name" required placeholder="Enter your name..." class="w-full px-4 py-3 rounded-xl bg-slate-950 border-2 border-slate-700 text-white focus:border-amber-500 transition outline-none font-medium text-sm">
+          </div>
+
+          <div>
+            <label for="student-class" class="block text-xs font-arcade text-amber-300 mb-2 uppercase">
+              <i class="fa-solid fa-users mr-1"></i> Select Class
+            </label>
+            <select id="student-class" required class="w-full px-4 py-3 rounded-xl bg-slate-950 border-2 border-slate-700 text-white focus:border-amber-500 transition outline-none font-medium text-sm">
+              <option value="" disabled selected>-- Select your class --</option>
+              <option value="1 Ibnu Sina">1 Ibnu Sina</option>
+              <option value="1 Al Batani">1 Al Batani</option>
+              <option value="2 Al Farabi">2 Al Farabi</option>
+              <option value="3 Ibnu Sina">3 Ibnu Sina</option>
+            </select>
+          </div>
+
+          <button type="submit" class="w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-arcade font-bold rounded-2xl arcade-btn text-sm sm:text-base flex items-center justify-center gap-2 mt-4">
+            <i class="fa-solid fa-play"></i>
+            <span>PRESS START TO FIX!</span>
+          </button>
+        </form>
+
+      </div>
+    </section>
+
+    <!-- 2. MAIN ARCADE HUB (BUILDING RESTORATION & TASKS) -->
+    <section id="screen-tasks-hub" class="hidden space-y-6">
+      
+      <!-- Top HUD Header Bar -->
+      <div class="bg-slate-900 rounded-2xl p-4 border-2 border-amber-500 flex flex-wrap items-center justify-between gap-4 shadow-lg">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-arcade text-xl font-bold shadow">
+            🔨
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-bold text-white" id="display-student-name">Student Name</h3>
+              <span class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold px-2 py-0.5 rounded-full" id="display-student-class">Class</span>
+            </div>
+            <div class="text-xs text-slate-400 mt-0.5" id="session-time">
+              <i class="fa-regular fa-clock mr-1"></i> Time: 00:00
+            </div>
+          </div>
+        </div>
+
+        <!-- Task Switching Badges -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="openTask(1)" id="hub-task1-badge" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 shadow flex items-center gap-2">
+            <i class="fa-solid fa-hammer"></i> Task 1: Repair Parts
+            <span id="task1-score-badge" class="bg-slate-950 text-amber-400 px-2 py-0.5 rounded-full font-arcade text-[10px]">0/5</span>
+          </button>
+          <button onclick="openTask(2)" id="hub-task2-badge" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-2">
+            <i class="fa-solid fa-cubes"></i> Task 2: Rebuild Email (80 Wds)
+            <span id="task2-score-badge" class="bg-slate-950 text-slate-400 px-2 py-0.5 rounded-full font-arcade text-[10px]">0/5</span>
+          </button>
+          <button onclick="finishSession()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check"></i> Submit High Score
+          </button>
+        </div>
+      </div>
+
+      <!-- VISUAL ARCADE BUILDING HUD (RALPH VS FELIX PROGRESS) -->
+      <div class="bg-slate-900 rounded-2xl p-5 border-2 border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
+        <!-- Building Status Window Grid -->
+        <div class="w-full md:w-2/3">
+          <div class="flex items-center justify-between mb-2 text-xs font-bold text-amber-400">
+            <span class="flex items-center gap-2 font-arcade"><i class="fa-solid fa-building"></i> NICELAND APARTMENT REPAIR STATUS</span>
+            <span id="building-repair-percent" class="font-arcade text-emerald-400">0% REPAIRED</span>
+          </div>
+          <!-- 10 Window slots for 5 T1 Sets + 5 T2 Sets -->
+          <div class="niceland-building p-4 rounded-xl border-2 border-red-950 grid grid-cols-5 gap-3" id="building-grid">
+            <!-- Windows dynamically updated -->
+          </div>
+        </div>
+
+        <!-- Animated Ralph / Felix Banner Status -->
+        <div class="w-full md:w-1/3 bg-slate-950 p-4 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center min-h-[120px]">
+          <div id="ralph-status-icon" class="text-4xl mb-2 ralph-animation">🧱</div>
+          <p id="ralph-status-text" class="text-xs font-arcade text-rose-400 leading-relaxed">
+            "I'M GONNA WRECK IT!"
+          </p>
+          <p class="text-[11px] text-slate-400 mt-1">Complete set tasks to help Felix fix the building!</p>
+        </div>
+      </div>
+
+      <!-- TASK 1 CONTAINER: REPAIR EMAIL PARTS -->
+      <div id="task1-view" class="space-y-6">
+        <div class="bg-slate-900 rounded-2xl p-5 border-2 border-slate-800">
+          <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+            <div>
+              <span class="text-[10px] font-arcade text-amber-400 bg-amber-950/60 border border-amber-800 px-2.5 py-1 rounded-md">TASK 1: MATCH EMAIL PARTS</span>
+              <h2 class="text-lg sm:text-xl font-heading font-bold text-white mt-2">Fix the Broken Sentences!</h2>
+              <p class="text-xs text-slate-400">Match each smashed sentence to its correct email section label (<span class="text-amber-300 font-semibold">Greetings, Opening, Content, Closing, Sign Off</span>).</p>
+            </div>
+            
+            <!-- Set Selector Buttons -->
+            <div class="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+              <span class="text-[10px] font-arcade text-slate-400 px-2">SET:</span>
+              <button onclick="loadTask1Set(0)" id="t1-set-0-btn" class="w-8 h-8 rounded-lg font-bold text-xs bg-amber-500 text-slate-950">1</button>
+              <button onclick="loadTask1Set(1)" id="t1-set-1-btn" class="w-8 h-8 rounded-lg font-bold text-xs bg-slate-800 text-slate-300">2</button>
+              <button onclick="loadTask1Set(2)" id="t1-set-2-btn" class="w-8 h-8 rounded-lg font-bold text-xs bg-slate-800 text-slate-300">3</button>
+              <button onclick="loadTask1Set(3)" id="t1-set-3-btn" class="w-8 h-8 rounded-lg font-bold text-xs bg-slate-800 text-slate-300">4</button>
+              <button onclick="loadTask1Set(4)" id="t1-set-4-btn" class="w-8 h-8 rounded-lg font-bold text-xs bg-slate-800 text-slate-300">5</button>
+            </div>
+          </div>
+
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs text-amber-300 font-semibold flex items-center gap-2">
+            <i class="fa-solid fa-wrench"></i>
+            <span id="t1-set-title">Set 1: Informal Invitation to Eco-Park</span>
+          </div>
+        </div>
+
+        <!-- Task 1 Interactive Matching Cards -->
+        <div class="grid grid-cols-1 gap-4" id="t1-questions-container">
+          <!-- Dynamic cards injected here -->
+        </div>
+
+        <!-- Controls -->
+        <div class="flex flex-wrap justify-between items-center bg-slate-900 rounded-2xl p-4 border border-slate-800 gap-4">
+          <div id="t1-feedback" class="text-xs font-semibold text-slate-300"></div>
+          <div class="flex gap-3">
+            <button onclick="checkTask1Set()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow arcade-btn flex items-center gap-2">
+              <i class="fa-solid fa-hammer"></i> FIX THIS FLOOR!
+            </button>
+            <button onclick="nextTask1Set()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition flex items-center gap-2">
+              <span>Next Floor</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TASK 2 CONTAINER: REBUILD EMAIL (STRICT 80 WORDS) -->
+      <div id="task2-view" class="hidden space-y-6">
+        <div class="bg-slate-900 rounded-2xl p-5 border-2 border-slate-800">
+          <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+            <div>
+              <span class="text-[10px] font-arcade text-sky-400 bg-sky-950/60 border border-sky-800 px-2.5 py-1 rounded-md">TASK 2: REBUILD EMAIL (CEFR A2-B1)</span>
+              <h2 class="text-lg sm:text-xl font-heading font-bold text-white mt-2">Reorder the Smashed Email Blocks</h2>
+              <p class="text-xs text-slate-400">Ralph smashed the reply into 5 blocks! Move them into the correct email order (Greetings → Opening → Content → Closing → Sign Off). <span class="text-amber-400 font-bold">Target Length: Exactly ~80 Words.</span></p>
+            </div>
+            
+            <!-- Set Selector Buttons -->
+            <div class="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+              <span class="text-[10px] font-arcade text-slate-400 px-2">SET:</span>
+              <button onclick="loadTask2Set(0)" id="t2-set-0-btn" class="w-8 h-8 rounded-lg font-bold text-xs bg-sky-500 text-slate-950">1</button>
+              <button onclick="loadTask2Set(1)" id="t2-set-1-btn" class="w-8 h-8 rounded-lg font-bold text-xs bg-slate-800 text-slate-300">2</button>
+              <button onclick="loadTask2Set(2)" id="t2-set-2-btn" class="w-8 h-8 rounded-lg font-bold text-xs bg-slate-800 text-slate-300">3</button>
+              <button onclick="loadTask2Set(3)" id="t2-set-3-btn" class="w-8 h-8 rounded-lg font-bold text-xs bg-slate-800 text-slate-300">4</button>
+              <button onclick="loadTask2Set(4)" id="t2-set-4-btn" class="w-8 h-8 rounded-lg font-bold text-xs bg-slate-800 text-slate-300">5</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question Prompt Email Box -->
+        <div class="bg-slate-950 rounded-2xl p-5 border-2 border-slate-800">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3 text-xs font-semibold text-slate-400">
+            <span class="text-amber-400 font-arcade text-[10px]"><i class="fa-solid fa-envelope mr-1"></i> INCOMING QUESTION EMAIL</span>
+            <span id="t2-set-topic" class="text-slate-300">Topic: Free Time Activity</span>
+          </div>
+          <div class="space-y-2 text-slate-200 text-xs sm:text-sm font-sans leading-relaxed" id="t2-prompt-box">
+            <!-- Dynamic prompt email -->
+          </div>
+        </div>
+
+        <!-- Interactive Reordering Area -->
+        <div class="bg-slate-900 rounded-2xl p-5 border-2 border-slate-800 space-y-4">
+          <div class="flex justify-between items-center mb-1">
+            <h3 class="font-heading font-bold text-white text-sm sm:text-base flex items-center gap-2">
+              <i class="fa-solid fa-sort text-sky-400"></i> Arrange Reply Paragraphs
+            </h3>
+            
+            <!-- Live Word Counter Indicator -->
+            <div class="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
+              <span class="text-[10px] font-arcade text-slate-400">TOTAL LENGTH:</span>
+              <span id="t2-word-count" class="text-xs font-bold text-amber-400 font-mono">80 Words</span>
+              <span class="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-bold">CEFR A2-B1</span>
+            </div>
+          </div>
+
+          <div id="t2-blocks-container" class="space-y-3">
+            <!-- Reorderable blocks dynamically generated -->
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex flex-wrap justify-between items-center bg-slate-900 rounded-2xl p-4 border border-slate-800 gap-4">
+          <div id="t2-feedback" class="text-xs font-semibold text-slate-300"></div>
+          <div class="flex gap-3">
+            <button onclick="checkTask2Set()" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs rounded-xl shadow arcade-btn flex items-center gap-2">
+              <i class="fa-solid fa-check"></i> VERIFY EMAIL FLOW
+            </button>
+            <button onclick="nextTask2Set()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition flex items-center gap-2">
+              <span>Next Floor</span>
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. TEACHER HIGH SCORES & RECORDS PORTAL -->
+    <section id="screen-teacher" class="hidden space-y-6">
+      <!-- Lock Overlay if not authenticated -->
+      <div id="teacher-lock-view" class="max-w-md mx-auto bg-slate-900 rounded-3xl p-8 arcade-border text-center">
+        <div class="w-16 h-16 bg-amber-500 text-slate-950 rounded-2xl mx-auto flex items-center justify-center text-2xl mb-4 font-bold shadow-lg">
+          🔒
+        </div>
+        <h2 class="text-base sm:text-lg font-arcade text-amber-400 mb-2">TEACHER PORTAL</h2>
+        <p class="text-slate-300 text-xs mb-6">Enter Teacher Faqihah's secret arcade code to inspect student progress.</p>
+        
+        <div class="space-y-4">
+          <input type="password" id="teacher-pass" placeholder="Enter password (faqihah)" class="w-full px-4 py-3 rounded-xl bg-slate-950 border-2 border-slate-700 text-center text-white font-mono outline-none text-sm focus:border-amber-500">
+          <button onclick="unlockTeacherDashboard()" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-arcade font-bold rounded-xl text-xs arcade-btn">
+            UNLOCK RECORDS
+          </button>
+          <p id="pass-error" class="text-xs text-rose-400 font-medium hidden">Incorrect password! Try 'faqihah'.</p>
+        </div>
+      </div>
+
+      <!-- Unlocked High Score Table View -->
+      <div id="teacher-content-view" class="hidden space-y-6">
+        <div class="bg-slate-900 rounded-2xl p-6 border-2 border-slate-800 flex flex-wrap justify-between items-center gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="bg-amber-500 text-slate-950 text-[10px] font-arcade px-2.5 py-1 rounded font-bold">TEACHER DASHBOARD</span>
+              <span class="text-xs text-slate-400">Fix-It Felix Arcade Logs</span>
+            </div>
+            <h2 class="text-xl font-heading font-bold text-white mt-1">Student Performance Records</h2>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <button onclick="exportToCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition flex items-center gap-2 shadow">
+              <i class="fa-solid fa-file-excel"></i> Export CSV
+            </button>
+            <button onclick="clearRecords()" class="px-4 py-2 bg-rose-950 border border-rose-800 text-rose-300 hover:bg-rose-900 font-bold text-xs rounded-xl transition flex items-center gap-2">
+              <i class="fa-solid fa-trash"></i> Reset All
+            </button>
+            <button onclick="lockTeacherDashboard()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition">
+              <i class="fa-solid fa-lock"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <span class="text-[10px] font-arcade text-slate-400 uppercase">Total Plays</span>
+            <div class="text-2xl font-arcade text-amber-400 mt-2" id="stat-total-students">0</div>
+          </div>
+          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <span class="text-[10px] font-arcade text-slate-400 uppercase">Avg Task 1</span>
+            <div class="text-2xl font-arcade text-emerald-400 mt-2" id="stat-avg-t1">0 / 5</div>
+          </div>
+          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <span class="text-[10px] font-arcade text-slate-400 uppercase">Avg Task 2</span>
+            <div class="text-2xl font-arcade text-sky-400 mt-2" id="stat-avg-t2">0 / 5</div>
+          </div>
+          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <span class="text-[10px] font-arcade text-slate-400 uppercase">Building Repair</span>
+            <div class="text-2xl font-arcade text-amber-300 mt-2" id="stat-repair-avg">0%</div>
+          </div>
+        </div>
+
+        <!-- Class Filter -->
+        <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <label class="text-xs font-bold text-slate-400 uppercase">Filter Class:</label>
+            <select id="filter-class" onchange="renderTeacherTable()" class="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs font-bold text-amber-300 outline-none">
+              <option value="ALL">All Classes</option>
+              <option value="1 Ibnu Sina">1 Ibnu Sina</option>
+              <option value="1 Al Batani">1 Al Batani</option>
+              <option value="2 Al Farabi">2 Al Farabi</option>
+              <option value="3 Ibnu Sina">3 Ibnu Sina</option>
+            </select>
+          </div>
+          <span class="text-[11px] text-slate-500">Auto-saved to Browser LocalStorage</span>
+        </div>
+
+        <!-- High Score Table -->
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-950 border-b border-slate-800 text-slate-400 text-[10px] font-arcade">
+                  <th class="py-3 px-4">Student</th>
+                  <th class="py-3 px-4">Class</th>
+                  <th class="py-3 px-4 text-center">Task 1 (Match)</th>
+                  <th class="py-3 px-4 text-center">Task 2 (80 Wds)</th>
+                  <th class="py-3 px-4 text-center">Repair Score</th>
+                  <th class="py-3 px-4 text-center">Duration</th>
+                  <th class="py-3 px-4">Date</th>
+                </tr>
+              </thead>
+              <tbody id="records-table-body" class="divide-y divide-slate-800 text-xs text-slate-300">
+                <!-- Dynamic rows -->
+              </tbody>
+            </table>
+          </div>
+          <div id="no-records-msg" class="p-8 text-center text-slate-500 text-xs font-arcade">
+            NO HIGH SCORES RECORDED YET.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-950 border-t border-slate-800 py-4 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+      Designed by <span class="font-bold text-amber-400">Teacher Faqihah</span> • Wreck-It Ralph English Email Learning Platform (CEFR A2-B1 Level)
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    /* ==========================================================
+       AUDIO SYNTHESIZER (WEB AUDIO API RETRO SFX)
+       ========================================================== */
+    let audioEnabled = true;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playRetroSound(type) {
+      if (!audioEnabled || !audioCtx) return;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+
+      if (type === 'fix') {
+        // High pitch hammer chime
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(587.33, now); // D5
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.15); // A5
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.start(now);
+        osc.stop(now + 0.15);
+      } else if (type === 'wreck') {
+        // Low Ralph smash noise
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.2);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      } else if (type === 'win') {
+        // Arcade Victory Melody
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+        osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      }
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      document.getElementById('audio-status').innerText = audioEnabled ? "SFX: ON" : "SFX: OFF";
+      document.getElementById('audio-icon').className = audioEnabled ? "fa-solid fa-volume-high" : "fa-solid fa-volume-xmark";
+    }
+
+    /* ==========================================================
+       DATA STRUCTURES: TASK 1 & TASK 2 (STRICT 80-WORD EMAILS)
+       ========================================================== */
+
+    // TASK 1: Match Sentence to Email Category (5 Sets)
+    const TASK1_SETS = [
+      {
+        title: "Set 1: Informal Invitation to Eco-Park",
+        items: [
+          { label: "Greetings", sentence: "Dear Sarah,", feedback: "Dear [Name] is a friendly informal greeting." },
+          { label: "Opening", sentence: "I hope you are having a wonderful week!", feedback: "Warm opening inquiry." },
+          { label: "Content", sentence: "Would you like to visit the new eco-park with me this Saturday morning?", feedback: "Main body purpose and invitation." },
+          { label: "Closing", sentence: "Let me know if you are free so we can arrange the bicycle rental.", feedback: "Closing request before ending." },
+          { label: "Sign Off", sentence: "Best regards, Alex", feedback: "Standard polite sign off." }
+        ]
+      },
+      {
+        title: "Set 2: Advice on Improving English",
+        items: [
+          { label: "Greetings", sentence: "Hi Daniel,", feedback: "Casual informal greeting." },
+          { label: "Opening", sentence: "Thanks for your email asking for advice on learning English.", feedback: "Acknowledges previous message." },
+          { label: "Content", sentence: "I recommend reading short storybooks and watching English cartoons with subtitles every day.", feedback: "Core suggestions." },
+          { label: "Closing", sentence: "I hope these tips will help you feel more confident in class!", feedback: "Encouraging closing line." },
+          { label: "Sign Off", sentence: "Warmly, Teacher Faqihah", feedback: "Friendly sign off." }
+        ]
+      },
+      {
+        title: "Set 3: School Science Exhibition Project",
+        items: [
+          { label: "Greetings", sentence: "Hello Group Members,", feedback: "Group email greeting." },
+          { label: "Opening", sentence: "I am writing to remind everyone about our upcoming Science project model.", feedback: "States clear objective." },
+          { label: "Content", sentence: "Please remember to bring recycled plastic bottles, scissors, and glue to school this Wednesday.", feedback: "Key details and requirements." },
+          { label: "Closing", sentence: "Reply to this message if you cannot find your materials on time.", feedback: "Action step before closing." },
+          { label: "Sign Off", sentence: "Yours sincerely, Class Leader", feedback: "Formal sign off." }
+        ]
+      },
+      {
+        title: "Set 4: Birthday Surprise Party Planning",
+        items: [
+          { label: "Greetings", sentence: "Hey Maya,", feedback: "Casual greeting between friends." },
+          { label: "Opening", sentence: "It was fantastic catching up with you at recess yesterday afternoon!", feedback: "Friendly opener." },
+          { label: "Content", sentence: "We are organizing a surprise birthday dinner for Adam at the lake bistro next Friday at 7 PM.", feedback: "Main event details." },
+          { label: "Closing", sentence: "Please keep this a complete secret so we do not ruin the big surprise!", feedback: "Final request line." },
+          { label: "Sign Off", sentence: "See you soon, Chloe", feedback: "Casual ending sign off." }
+        ]
+      },
+      {
+        title: "Set 5: Holiday Trip Recommendations",
+        items: [
+          { label: "Greetings", sentence: "Dearest Uncle Johan,", feedback: "Affectionate family greeting." },
+          { label: "Opening", sentence: "I heard from my mother that you are planning a trip to Langkawi Island next month.", feedback: "Contextual opening." },
+          { label: "Content", sentence: "You should definitely try the famous cable car ride and visit the underwater marine sanctuary.", feedback: "Travel recommendations." },
+          { label: "Closing", sentence: "Have a safe trip and please send us some photos when you arrive!", feedback: "Well wishes." },
+          { label: "Sign Off", sentence: "With love, Ryan", feedback: "Affectionate sign off." }
+        ]
+      }
+    ];
+
+    // TASK 2: Rearrange Email Reply (5 Sets)
+    // CRITICAL REQUIREMENT: EACH REBUILDABLE EMAIL IS EXACTLY 80 WORDS (A2-B1 CEFR STANDARD)
+    const TASK2_SETS = [
+      {
+        topic: "Free Time Cycling Activity",
+        prompt: "<strong>From:</strong> Lucas &lt;lucas@school.edu&gt;<br><strong>Subject:</strong> Weekend Cycling Trip?<br><br>Hi Alex,<br>Are you free this Saturday morning? A few of us are planning a cycling trip along the lake trail at 8:00 AM. Let me know if you can join us!",
+        correctBlocks: [
+          /* Greetings */ "Hi Lucas,",
+          /* Opening   */ "Thank you for inviting me to join the cycling trip along the lake trail this Saturday morning.",
+          /* Content   */ "I am definitely free and would love to come along. My bicycle is in great condition, but could we please stop by the garden cafe near the park after cycling to have some warm breakfast together?",
+          /* Closing   */ "Please let me know what time we will finish so I can inform my parents early.",
+          /* Sign Off  */ "Best wishes, Alex"
+        ]
+      },
+      {
+        topic: "School Library Book Return",
+        prompt: "<strong>From:</strong> Librarian Mrs. Nora &lt;library@school.edu&gt;<br><strong>Subject:</strong> Overdue Book Reminder<br><br>Dear Student,<br>Our library records show that 'The Great Adventure' was due yesterday. Please return or renew it as soon as possible.",
+        correctBlocks: [
+          /* Greetings */ "Dear Mrs. Nora,",
+          /* Opening   */ "Thank you for sending me this polite reminder regarding my overdue library book today.",
+          /* Content   */ "I sincerely apologize for the slight delay in returning it. I finished reading the final chapter last night and will hand the book over to the library counter during our morning recess.",
+          /* Closing   */ "Could you also please help me reserve the sequel book for next week if available?",
+          /* Sign Off  */ "Kind regards, Adam"
+        ]
+      },
+      {
+        topic: "Preparation for English Test",
+        prompt: "<strong>From:</strong> Mei Ling &lt;meiling@mail.com&gt;<br><strong>Subject:</strong> English Grammar Revision<br><br>Hey Hannah,<br>I am feeling quite nervous about our upcoming A2 English grammar test next Tuesday. How are you revising for it?",
+        correctBlocks: [
+          /* Greetings */ "Hi Mei Ling,",
+          /* Opening   */ "Don't worry too much because you have been doing very well in our daily English lessons.",
+          /* Content   */ "I am currently revising Teacher Faqihah's email writing guidelines and completing online grammar exercises every evening. I find practicing model sentences really helpful for building confidence before taking the actual test.",
+          /* Closing   */ "Would you like to revise together at the town library right after school this afternoon?",
+          /* Sign Off  */ "Talk soon, Hannah"
+        ]
+      },
+      {
+        topic: "Absence Notice for Football Practice",
+        prompt: "<strong>From:</strong> Coach Farhan &lt;sports@school.edu&gt;<br><strong>Subject:</strong> Football Practice Attendance<br><br>Hello Squad,<br>Remember we have mandatory football practice this Thursday afternoon at 4:00 PM sharp on the main field.",
+        correctBlocks: [
+          /* Greetings */ "Dear Coach Farhan,",
+          /* Opening   */ "I am writing this email to inform you that I will unfortunately miss our football practice.",
+          /* Content   */ "I have an important dentist appointment scheduled for 4:30 PM this Thursday that my parents booked last month. I promise to do extra cardio running exercises on Friday morning to catch up.",
+          /* Closing   */ "Thank you very much for your understanding, and I will see you at next week's training.",
+          /* Sign Off  */ "Respectfully yours, Tariq"
+        ]
+      },
+      {
+        topic: "Camping Trip Gratitude & Photos",
+        prompt: "<strong>From:</strong> Aunt Sabrina &lt;sabrina@web.com&gt;<br><strong>Subject:</strong> Family Camping Trip Photos<br><br>Dearest Family,<br>Thank you all for making our camping trip so special! I have uploaded all the photos to our shared family drive.",
+        correctBlocks: [
+          /* Greetings */ "Dearest Aunt Sabrina,",
+          /* Opening   */ "Thank you so much for uploading and sharing those wonderful camping photographs with all of us.",
+          /* Content   */ "Looking at the pictures of our evening campfire and river kayaking brings back such happy memories from last weekend. Everyone had an incredible time exploring nature together and sharing funny stories.",
+          /* Closing   */ "Please let us know when you plan the next outdoor holiday so we can book early.",
+          /* Sign Off  */ "Lots of love, Sofia"
+        ]
+      }
+    ];
+
+    /* Helper function to count exact words */
+    function countWords(str) {
+      return str.trim().split(/\s+/).filter(w => w.length > 0).length;
+    }
+
+    /* ==========================================================
+       GLOBAL APP STATE
+       ========================================================== */
+    let currentUser = {
+      name: "",
+      class: "",
+      startTime: null,
+      task1Scores: [0, 0, 0, 0, 0],
+      task2Scores: [0, 0, 0, 0, 0]
+    };
+
+    let currentT1Set = 0;
+    let currentT2Set = 0;
+    let t2CurrentOrder = [];
+    let timerInterval = null;
+
+    /* ==========================================================
+       NAVIGATION & LOGIN
+       ========================================================== */
+
+    function switchTab(tab) {
+      document.getElementById('screen-welcome').classList.add('hidden');
+      document.getElementById('screen-tasks-hub').classList.add('hidden');
+      document.getElementById('screen-teacher').classList.add('hidden');
+
+      const studentBtn = document.getElementById('nav-student-btn');
+      const teacherBtn = document.getElementById('nav-teacher-btn');
+
+      if (tab === 'student') {
+        studentBtn.className = "px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold shadow";
+        teacherBtn.className = "px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition";
+        if (!currentUser.name) {
+          document.getElementById('screen-welcome').classList.remove('hidden');
+        } else {
+          document.getElementById('screen-tasks-hub').classList.remove('hidden');
+        }
+      } else if (tab === 'teacher') {
+        teacherBtn.className = "px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold shadow";
+        studentBtn.className = "px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition";
+        document.getElementById('screen-teacher').classList.remove('hidden');
+        renderTeacherTable();
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById('student-name').value.trim();
+      const classInput = document.getElementById('student-class').value;
+
+      if (!nameInput || !classInput) return;
+
+      currentUser.name = nameInput;
+      currentUser.class = classInput;
+      currentUser.startTime = new Date();
+
+      document.getElementById('display-student-name').innerText = currentUser.name;
+      document.getElementById('display-student-class').innerText = currentUser.class;
+
+      playRetroSound('win');
+      startSessionTimer();
+      renderBuildingHUD();
+      switchTab('student');
+      openTask(1);
+    }
+
+    function startSessionTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (!currentUser.startTime) return;
+        const diffSecs = Math.floor((new Date() - currentUser.startTime) / 1000);
+        const mins = String(Math.floor(diffSecs / 60)).padStart(2, '0');
+        const secs = String(diffSecs % 60).padStart(2, '0');
+        document.getElementById('session-time').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> Time: ${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function openTask(taskNum) {
+      const t1Btn = document.getElementById('hub-task1-badge');
+      const t2Btn = document.getElementById('hub-task2-badge');
+      const t1View = document.getElementById('task1-view');
+      const t2View = document.getElementById('task2-view');
+
+      if (taskNum === 1) {
+        t1View.classList.remove('hidden');
+        t2View.classList.add('hidden');
+        t1Btn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 shadow flex items-center gap-2";
+        t2Btn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-2";
+        loadTask1Set(currentT1Set);
+      } else {
+        t1View.classList.add('hidden');
+        t2View.classList.remove('hidden');
+        t2Btn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-sky-500 text-slate-950 shadow flex items-center gap-2";
+        t1Btn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-2";
+        loadTask2Set(currentT2Set);
+      }
+    }
+
+    /* ==========================================================
+       BUILDING HUD RENDERING (RALPH VS FELIX)
+       ========================================================== */
+
+    function renderBuildingHUD() {
+      const grid = document.getElementById('building-grid');
+      grid.innerHTML = "";
+
+      let totalFixed = 0;
+
+      // 10 windows total (5 for Task 1 sets, 5 for Task 2 sets)
+      for (let i = 0; i < 10; i++) {
+        const isTask1 = i < 5;
+        const setIndex = i % 5;
+        const isFixed = isTask1 ? (currentUser.task1Scores[setIndex] === 1) : (currentUser.task2Scores[setIndex] === 1);
+
+        if (isFixed) totalFixed++;
+
+        const winEl = document.createElement('div');
+        winEl.className = `h-14 rounded-lg flex flex-col items-center justify-center font-arcade text-[10px] ${isFixed ? 'window-intact text-yellow-200' : 'window-broken text-red-300'}`;
+        winEl.innerHTML = `
+          <span>${isTask1 ? 'T1' : 'T2'}-${setIndex+1}</span>
+          <span class="text-[12px]">${isFixed ? '🔨' : '💥'}</span>
+        `;
+        grid.appendChild(winEl);
+      }
+
+      const percent = Math.round((totalFixed / 10) * 100);
+      document.getElementById('building-repair-percent').innerText = `${percent}% REPAIRED`;
+
+      const ralphIcon = document.getElementById('ralph-status-icon');
+      const ralphText = document.getElementById('ralph-status-text');
+
+      if (percent === 100) {
+        ralphIcon.innerText = "🏆";
+        ralphIcon.className = "text-4xl mb-2 animate-bounce";
+        ralphText.innerText = '"YOU CAN FIX IT! BUILDING IS RESTORED!"';
+        ralphText.className = "text-xs font-arcade text-emerald-400 leading-relaxed";
+      } else if (percent > 50) {
+        ralphIcon.innerText = "😤";
+        ralphIcon.className = "text-4xl mb-2 ralph-animation";
+        ralphText.innerText = '"GRRR... FELIX IS FIXING MY SMASHES!"';
+        ralphText.className = "text-xs font-arcade text-amber-400 leading-relaxed";
+      } else {
+        ralphIcon.innerText = "🧱";
+        ralphIcon.className = "text-4xl mb-2 ralph-animation";
+        ralphText.innerText = '"I\'M GONNA WRECK IT!"';
+        ralphText.className = "text-xs font-arcade text-rose-400 leading-relaxed";
+      }
+    }
+
+    /* ==========================================================
+       TASK 1 LOGIC: MATCH SENTENCES TO CATEGORIES
+       ========================================================== */
+
+    function loadTask1Set(setIdx) {
+      currentT1Set = setIdx;
+      const setData = TASK1_SETS[setIdx];
+
+      for (let i = 0; i < 5; i++) {
+        const btn = document.getElementById(`t1-set-${i}-btn`);
+        if (i === setIdx) {
+          btn.className = "w-8 h-8 rounded-lg font-bold text-xs bg-amber-500 text-slate-950 shadow";
+        } else {
+          btn.className = "w-8 h-8 rounded-lg font-bold text-xs bg-slate-800 text-slate-300 hover:bg-slate-700";
+        }
+      }
+
+      document.getElementById('t1-set-title').innerText = setData.title;
+      document.getElementById('t1-feedback').innerHTML = "";
+
+      const shuffled = setData.items.map((item, origIdx) => ({ item, origIdx }))
+                                   .sort(() => 0.5 - Math.random());
+
+      const container = document.getElementById('t1-questions-container');
+      container.innerHTML = "";
+
+      shuffled.forEach((obj, idx) => {
+        const item = obj.item;
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 p-4 rounded-xl border border-slate-800 shadow flex flex-col md:flex-row md:items-center justify-between gap-4";
+
+        card.innerHTML = `
+          <div class="flex items-start gap-3 flex-1">
+            <span class="w-6 h-6 rounded-full bg-slate-800 text-amber-400 font-arcade text-[10px] flex items-center justify-center shrink-0 mt-0.5">${idx + 1}</span>
+            <div>
+              <p class="text-slate-200 text-xs sm:text-sm font-medium">"${item.sentence}"</p>
+              <div id="t1-hint-${idx}" class="text-xs mt-1 hidden"></div>
+            </div>
+          </div>
+          <div class="shrink-0">
+            <select id="t1-select-${idx}" class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs font-semibold text-amber-300 outline-none w-full md:w-auto">
+              <option value="" disabled selected>-- Select Category --</option>
+              <option value="Greetings">Greetings</option>
+              <option value="Opening">Opening</option>
+              <option value="Content">Content</option>
+              <option value="Closing">Closing</option>
+              <option value="Sign Off">Sign Off</option>
+            </select>
+          </div>
+        `;
+        card.dataset.correctLabel = item.label;
+        card.dataset.explanation = item.feedback;
+        container.appendChild(card);
+      });
+    }
+
+    function checkTask1Set() {
+      const container = document.getElementById('t1-questions-container');
+      const cards = container.children;
+      let correctCount = 0;
+      let total = cards.length;
+
+      for (let i = 0; i < total; i++) {
+        const card = cards[i];
+        const selectEl = document.getElementById(`t1-select-${i}`);
+        const hintEl = document.getElementById(`t1-hint-${i}`);
+        const userVal = selectEl.value;
+        const correctVal = card.dataset.correctLabel;
+        const explanation = card.dataset.explanation;
+
+        if (userVal === correctVal) {
+          correctCount++;
+          selectEl.className = "px-3 py-2 rounded-xl border-2 border-emerald-500 bg-emerald-950/60 text-xs font-bold text-emerald-300 outline-none w-full md:w-auto";
+          hintEl.className = "text-xs font-semibold text-emerald-400 mt-1 block";
+          hintEl.innerHTML = `<i class="fa-solid fa-check mr-1"></i> Correct! ${explanation}`;
+        } else {
+          selectEl.className = "px-3 py-2 rounded-xl border-2 border-rose-500 bg-rose-950/60 text-xs font-bold text-rose-300 outline-none w-full md:w-auto";
+          hintEl.className = "text-xs font-semibold text-rose-400 mt-1 block";
+          hintEl.innerHTML = `<i class="fa-solid fa-xmark mr-1"></i> Correct: <strong>${correctVal}</strong> (${explanation})`;
+        }
+      }
+
+      const isAllCorrect = (correctCount === total);
+      currentUser.task1Scores[currentT1Set] = isAllCorrect ? 1 : 0;
+
+      if (isAllCorrect) {
+        playRetroSound('fix');
+        confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
+        document.getElementById('t1-feedback').innerHTML = `<span class="text-emerald-400 font-bold flex items-center gap-1.5 font-arcade text-[11px]"><i class="fa-solid fa-hammer"></i> FLOOR ${currentT1Set+1} REPAIRED PERFECTLY!</span>`;
+      } else {
+        playRetroSound('wreck');
+        document.getElementById('t1-feedback').innerHTML = `<span class="text-amber-400 font-semibold">You fixed ${correctCount} / ${total} sentences. Check hints and try again!</span>`;
+      }
+
+      updateScoresAndHUD();
+    }
+
+    function nextTask1Set() {
+      if (currentT1Set < 4) {
+        loadTask1Set(currentT1Set + 1);
+      } else {
+        openTask(2);
+      }
+    }
+
+    /* ==========================================================
+       TASK 2 LOGIC: REBUILD EMAIL (STRICT 80-WORD VERIFICATION)
+       ========================================================== */
+
+    function loadTask2Set(setIdx) {
+      currentT2Set = setIdx;
+      const setData = TASK2_SETS[setIdx];
+
+      for (let i = 0; i < 5; i++) {
+        const btn = document.getElementById(`t2-set-${i}-btn`);
+        if (i === setIdx) {
+          btn.className = "w-8 h-8 rounded-lg font-bold text-xs bg-sky-500 text-slate-950 shadow";
+        } else {
+          btn.className = "w-8 h-8 rounded-lg font-bold text-xs bg-slate-800 text-slate-300 hover:bg-slate-700";
+        }
+      }
+
+      document.getElementById('t2-set-topic').innerText = `Topic: ${setData.topic}`;
+      document.getElementById('t2-prompt-box').innerHTML = setData.prompt;
+      document.getElementById('t2-feedback').innerHTML = "";
+
+      // Compute total words of assembling blocks to verify strict 80-word requirement
+      const fullText = setData.correctBlocks.join(" ");
+      const totalWords = countWords(fullText);
+      document.getElementById('t2-word-count').innerText = `${totalWords} Words`;
+
+      // Jumble order
+      let indices = [0, 1, 2, 3, 4];
+      do {
+        indices.sort(() => Math.random() - 0.5);
+      } while (indices.every((val, idx) => val === idx));
+
+      t2CurrentOrder = indices;
+      renderTask2Blocks();
+    }
+
+    function renderTask2Blocks() {
+      const setData = TASK2_SETS[currentT2Set];
+      const container = document.getElementById('t2-blocks-container');
+      container.innerHTML = "";
+
+      t2CurrentOrder.forEach((blockOrigIdx, position) => {
+        const blockText = setData.correctBlocks[blockOrigIdx];
+        const blockEl = document.createElement('div');
+        blockEl.className = "bg-slate-950 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between gap-3 shadow";
+
+        blockEl.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-sky-950 border border-sky-800 text-sky-400 font-arcade text-[10px] flex items-center justify-center shrink-0">${position + 1}</span>
+            <p class="text-slate-200 text-xs sm:text-sm font-medium leading-relaxed">${blockText}</p>
+          </div>
+          <div class="flex items-center gap-1 shrink-0">
+            <button onclick="moveBlock(${position}, -1)" ${position === 0 ? 'disabled class="opacity-30 cursor-not-allowed p-1.5 bg-slate-800 rounded text-slate-500"' : 'class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-amber-400 shadow transition"'}>
+              <i class="fa-solid fa-arrow-up text-xs"></i>
+            </button>
+            <button onclick="moveBlock(${position}, 1)" ${position === t2CurrentOrder.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed p-1.5 bg-slate-800 rounded text-slate-500"' : 'class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-amber-400 shadow transition"'}>
+              <i class="fa-solid fa-arrow-down text-xs"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(blockEl);
+      });
+    }
+
+    function moveBlock(fromIdx, direction) {
+      const toIdx = fromIdx + direction;
+      if (toIdx < 0 || toIdx >= t2CurrentOrder.length) return;
+
+      const temp = t2CurrentOrder[fromIdx];
+      t2CurrentOrder[fromIdx] = t2CurrentOrder[toIdx];
+      t2CurrentOrder[toIdx] = temp;
+
+      renderTask2Blocks();
+    }
+
+    function checkTask2Set() {
+      let isCorrect = true;
+      for (let i = 0; i < t2CurrentOrder.length; i++) {
+        if (t2CurrentOrder[i] !== i) {
+          isCorrect = false;
+          break;
+        }
+      }
+
+      const fb = document.getElementById('t2-feedback');
+      if (isCorrect) {
+        currentUser.task2Scores[currentT2Set] = 1;
+        playRetroSound('fix');
+        confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
+        fb.innerHTML = `<span class="text-sky-400 font-bold flex items-center gap-1.5 font-arcade text-[11px]"><i class="fa-solid fa-circle-check"></i> 80-WORD EMAIL RESTORED IN PERFECT ORDER!</span>`;
+      } else {
+        currentUser.task2Scores[currentT2Set] = 0;
+        playRetroSound('wreck');
+        fb.innerHTML = `<span class="text-rose-400 font-semibold text-xs"><i class="fa-solid fa-circle-xmark mr-1"></i> Order incomplete. Remember: Greetings → Opening → Content → Closing → Sign Off.</span>`;
+      }
+
+      updateScoresAndHUD();
+    }
+
+    function nextTask2Set() {
+      if (currentT2Set < 4) {
+        loadTask2Set(currentT2Set + 1);
+      } else {
+        finishSession();
+      }
+    }
+
+    function updateScoresAndHUD() {
+      const t1Total = currentUser.task1Scores.reduce((a, b) => a + b, 0);
+      const t2Total = currentUser.task2Scores.reduce((a, b) => a + b, 0);
+
+      document.getElementById('task1-score-badge').innerText = `${t1Total}/5`;
+      document.getElementById('task2-score-badge').innerText = `${t2Total}/5`;
+
+      renderBuildingHUD();
+      saveCurrentProgressToStorage();
+    }
+
+    /* ==========================================================
+       TEACHER HIGH SCORES & STORAGE
+       ========================================================== */
+
+    const STORAGE_KEY = "teacher_faqihah_ralph_records";
+
+    function unlockTeacherDashboard() {
+      const pass = document.getElementById('teacher-pass').value;
+      if (pass === "faqihah" || pass === "teacher" || pass === "1234") {
+        document.getElementById('teacher-lock-view').classList.add('hidden');
+        document.getElementById('teacher-content-view').classList.remove('hidden');
+        document.getElementById('pass-error').classList.add('hidden');
+        playRetroSound('win');
+        renderTeacherTable();
+      } else {
+        playRetroSound('wreck');
+        document.getElementById('pass-error').classList.remove('hidden');
+      }
+    }
+
+    function lockTeacherDashboard() {
+      document.getElementById('teacher-lock-view').classList.remove('hidden');
+      document.getElementById('teacher-content-view').classList.add('hidden');
+    }
+
+    function getStoredRecords() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveCurrentProgressToStorage() {
+      if (!currentUser.name || !currentUser.class) return;
+
+      const records = getStoredRecords();
+      const existingIdx = records.findIndex(r => r.name.toLowerCase() === currentUser.name.toLowerCase() && r.class === currentUser.class);
+
+      const t1Total = currentUser.task1Scores.reduce((a, b) => a + b, 0);
+      const t2Total = currentUser.task2Scores.reduce((a, b) => a + b, 0);
+      const repairPct = Math.round(((t1Total + t2Total) / 10) * 100);
+
+      const durationSecs = currentUser.startTime ? Math.floor((new Date() - currentUser.startTime) / 1000) : 0;
+      const mins = Math.floor(durationSecs / 60);
+      const secs = durationSecs % 60;
+
+      const recordObj = {
+        name: currentUser.name,
+        class: currentUser.class,
+        task1Score: t1Total,
+        task2Score: t2Total,
+        repairPct: `${repairPct}%`,
+        duration: `${mins}m ${secs}s`,
+        timestamp: new Date().toLocaleString()
+      };
+
+      if (existingIdx >= 0) {
+        records[existingIdx] = recordObj;
+      } else {
+        records.push(recordObj);
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      renderTeacherTable();
+    }
+
+    function finishSession() {
+      saveCurrentProgressToStorage();
+      playRetroSound('win');
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
+
+      const t1Total = currentUser.task1Scores.reduce((a, b) => a + b, 0);
+      const t2Total = currentUser.task2Scores.reduce((a, b) => a + b, 0);
+      const percent = Math.round(((t1Total + t2Total) / 10) * 100);
+
+      alert(`🔨 HIGH SCORE RECORDED FOR ${currentUser.name.toUpperCase()} (${currentUser.class})!\n\nTask 1 Score: ${t1Total}/5\nTask 2 Score: ${t2Total}/5\nBuilding Repaired: ${percent}%\n\nTeacher Faqihah has received your results!`);
+    }
+
+    function renderTeacherTable() {
+      const records = getStoredRecords();
+      const filterClass = document.getElementById('filter-class') ? document.getElementById('filter-class').value : "ALL";
+      const tbody = document.getElementById('records-table-body');
+      const noRecMsg = document.getElementById('no-records-msg');
+
+      if (!tbody) return;
+
+      const filtered = filterClass === "ALL" ? records : records.filter(r => r.class === filterClass);
+
+      tbody.innerHTML = "";
+      if (filtered.length === 0) {
+        noRecMsg.classList.remove('hidden');
+      } else {
+        noRecMsg.classList.add('hidden');
+        filtered.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-800 transition";
+          tr.innerHTML = `
+            <td class="py-3 px-4 font-bold text-white">${r.name}</td>
+            <td class="py-3 px-4"><span class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] px-2 py-0.5 rounded-full font-bold">${r.class}</span></td>
+            <td class="py-3 px-4 text-center font-bold text-emerald-400">${r.task1Score} / 5</td>
+            <td class="py-3 px-4 text-center font-bold text-sky-400">${r.task2Score} / 5</td>
+            <td class="py-3 px-4 text-center font-arcade text-amber-400">${r.repairPct}</td>
+            <td class="py-3 px-4 text-center text-xs text-slate-400">${r.duration}</td>
+            <td class="py-3 px-4 text-xs text-slate-500">${r.timestamp}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Stats
+      document.getElementById('stat-total-students').innerText = records.length;
+      if (records.length > 0) {
+        const avgT1 = (records.reduce((acc, r) => acc + r.task1Score, 0) / records.length).toFixed(1);
+        const avgT2 = (records.reduce((acc, r) => acc + r.task2Score, 0) / records.length).toFixed(1);
+        const avgPct = Math.round(records.reduce((acc, r) => acc + parseInt(r.repairPct), 0) / records.length);
+
+        document.getElementById('stat-avg-t1').innerText = `${avgT1} / 5`;
+        document.getElementById('stat-avg-t2').innerText = `${avgT2} / 5`;
+        document.getElementById('stat-repair-avg').innerText = `${avgPct}%`;
+      } else {
+        document.getElementById('stat-avg-t1').innerText = "0 / 5";
+        document.getElementById('stat-avg-t2').innerText = "0 / 5";
+        document.getElementById('stat-repair-avg').innerText = "0%";
+      }
+    }
+
+    function exportToCSV() {
+      const records = getStoredRecords();
+      if (records.length === 0) {
+        alert("No student high scores recorded yet.");
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Student Name,Class,Task 1 Score,Task 2 Score,Repair Percentage,Duration,Timestamp\n";
+
+      records.forEach(r => {
+        csvContent += `"${r.name}","${r.class}",${r.task1Score},${r.task2Score},"${r.repairPct}","${r.duration}","${r.timestamp}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Teacher_Faqihah_WreckIt_Ralph_Records_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function clearRecords() {
+      if (confirm("Are you sure you want to clear all student records?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        renderTeacherTable();
+      }
+    }
+  </script>
+</body>
+</html>
